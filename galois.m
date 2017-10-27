@@ -7,39 +7,89 @@
 % C(x) = A(x) · B(x) = x^5 + x^3 + x^2 + x
 % C(x) = x^3 mod P(x)
 
-Ax = [1 0 1 1];
-Bx = [0 1 1];
-prim_poly = [1 1 0 0 1];
-Galois_visualmul(Ax, Bx, 2, prim_poly)
-
-% non-monic casting to monic
-Ax = [2 2];
-Bx = [2];
-prim_poly = [1 0 1];
-Galois_visualmul(Ax, Bx, 3, prim_poly)
-
-Ax = [1 0 0 1];
-Bx = [1 1 1];
-Galois_visualrawdiv(Ax, Bx, 2)
-
-Ax = [1 0 1 1];
-Bx = [1 1];
-Galois_visualrawdiv(Ax, Bx, 2)
-
-Ax = [1 2 1];
-Bx = [1 1];
-Galois_visualrawdiv(Ax, Bx, 3)
-
-p = 2;
-for m = 0:4
-	fprintf('~~~ base = %d, degree = %d ~~~\n', p, m)
-	Galois_irreducible(p, m)
-end
-
+%   Ax = [2 1];
+%   Bx = [2 2];
+%   prim_poly = [1 0 1];
+%   Galois_visualmul(Ax, Bx, 3, prim_poly)
+%   
+%   Ax = [1 0 1 1];
+%   Bx = [0 1 1];
+%   prim_poly = [1 1 0 0 1];
+%   Galois_visualmul(Ax, Bx, 2, prim_poly)
+%   
+%   % non-monic casting to monic
+%   Ax = [2 2];
+%   Bx = [2];
+%   prim_poly = [1 0 1];
+%   Galois_visualmul(Ax, Bx, 3, prim_poly)
+%   
+%   Ax = [1 0 0 1];
+%   Bx = [1 1 1];
+%   Galois_visualrawdiv(Ax, Bx, 2)
+%   
+%   Ax = [1 0 1 1];
+%   Bx = [1 1];
+%   Galois_visualrawdiv(Ax, Bx, 2)
+%   
+%   Ax = [1 2 1];
+%   Bx = [1 1];
+%   Galois_visualrawdiv(Ax, Bx, 3)
+%   
+%   p = 2;
+%   for m = 0:4
+%   	fprintf('~~~ base = %d, degree = %d ~~~\n', p, m)
+%   	Galois_irreducible(p, m)
+%   end
+%   
 p = 3;
 for m = 0:2
 	fprintf('~~~ base = %d, degree = %d ~~~\n', p, m)
 	Galois_irreducible(p, m)
+end
+
+prim_poly = [2 2 1];
+fprintf('~~~ generating using polynomial: '); polystring(prim_poly, ' ~~~\n')
+Galois_generate([1 1], 3, 2, prim_poly)
+
+prim_poly = [2 1 1];
+fprintf('~~~ generating using polynomial: '); polystring(prim_poly, ' ~~~\n')
+Galois_generate([1 1], 3, 2, prim_poly)
+
+prim_poly = [1 0 1];
+fprintf('~~~ generating using polynomial: '); polystring(prim_poly, ' ~~~\n')
+Galois_generate([1 1], 3, 2, prim_poly)
+
+function Galois_generate(Ax, p, m, prim_poly)
+	Cx = [1];
+	seen = cell(0);
+	n_elem = p^m;
+	if n_elem < 2
+		return
+	end
+	for pow = 0: n_elem - 2
+		fprintf('(')
+		polystring(Ax, ')^')
+		fprintf('%d', pow)
+		fprintf(' = ')
+		polystring(Cx, '\n')
+
+		found = false;
+		for idx = 1:length(seen)
+			if seen{idx} == Cx
+				if length(seen{idx}) == length(Cx)
+					found = true;
+					disp('start to repeat ...')
+					break;
+				end
+			end
+		end
+
+		if found
+			break;
+		end
+		seen = [seen; Cx];
+		Cx = Galois_mul(Ax, Cx, p, prim_poly);
+	end
 end
 
 function Galois_irreducible(base, degree)
